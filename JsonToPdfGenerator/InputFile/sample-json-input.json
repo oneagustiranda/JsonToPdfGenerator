@@ -1,0 +1,58 @@
+{
+  "Client Information": {
+    "Client Name": "Lin Guang",
+    "Date of Birth": "1990-05-15",
+    "Gender": "Male",
+    "Marital Status": "Single",
+    "Employment Status": "Employed"
+  },
+  "Financials": {
+    "Monthly Income": "$5000",
+    "Monthly Expenses": "$3500",
+    "Savings": "$10000",
+    "Investments": "$25000",
+    "Debts": "$5000",
+    "Cashflow": "$1500",
+    "Net Worth": "$35000"
+  },
+  "Goals": [
+    {
+      "Goal": "Emergency Fund",
+      "Target Amount": "$10000",
+      "Monthly Contribution": "$500",
+      "Estimated Duration": "20 months"
+    },
+    {
+      "Goal": "Travel",
+      "Target Amount": "$5000",
+      "Monthly Contribution": "$200",
+      "Estimated Duration": "25 months"
+    },
+    {
+      "Goal": "Home Purchase",
+      "Target Amount": "$150000",
+      "Monthly Contribution": "$3000",
+      "Estimated Duration": "50 months"
+    }
+  ],
+  "Insurances": [
+    {
+      "Insurance Type": "Life Insurance",
+      "Coverage Amount": "$100000",
+      "Monthly Premium": "$200",
+      "Provider": "ABC Insurance"
+    },
+    {
+      "Insurance Type": "Health Insurance",
+      "Coverage Amount": "$5000",
+      "Monthly Premium": "$100",
+      "Provider": "XYZ Insurance"
+    },
+    {
+      "Insurance Type": "Disability Insurance",
+      "Coverage Amount": "$3000",
+      "Monthly Premium": "$150",
+      "Provider": "PQR Insurance"
+    }
+  ]
+}
