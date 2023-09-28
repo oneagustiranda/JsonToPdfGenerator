@@ -2,7 +2,47 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container">
+    <div class="text-center">
+        <h1 class="display-4">JSON Editor</h1>
+        <p>Convert your JSON to PDF</p>
+    </div>
+
+    @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+    {
+        <div class="alert alert-warning">
+            <strong>Warning!</strong> @ViewBag.ErrorMessage
+        </div>
+    }    
+
+    <form method="post" action="/Home/ConvertJsonToPdf" class="form-inline">
+        <div class="row">        
+            <div class="col-8">
+                <!-- JSON Editor Container -->
+                <textarea name="jsonInput" rows="10" cols="65" class="form-control"></textarea><br /><br />
+            </div>
+            <div class="col-4">
+                <h5>Options <sup>(Optional)</sup></h5>
+                <!-- Tambahkan elemen-elemen konfigurasi tambahan di sini -->
+
+                <div class="form-group">
+                    <label for="fontSize">Ukuran Font:</label>
+                    <input type="text" name="fontSize" value="12" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="fontType">Jenis Font:</label>
+                    <select name="fontType" class="form-control">
+                        <option value="Arial">Arial</option>
+                        <option value="Calibri">Calibri</option>
+                        <option value="Cambria">Cambria</option>
+                        <!-- Tambahkan pilihan jenis font lainnya -->
+                    </select>
+                </div>
+
+                <input type="submit" value="Convert" class="btn btn-primary mt-3" />
+            </div>
+        </div>
+    </form>
+    
 </div>

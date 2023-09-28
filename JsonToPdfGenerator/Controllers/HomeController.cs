@@ -1,6 +1,8 @@
 ﻿using JsonToPdfGenerator.Models;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using System.Diagnostics;
+using System.Text.Json;
 
 namespace JsonToPdfGenerator.Controllers
 {
@@ -15,8 +17,19 @@ namespace JsonToPdfGenerator.Controllers
 
         public IActionResult Index()
         {
-            string jsonFilePath = "InputFile/sample-json-input.json";
-            FileContentResult pdfResult = JsonToPdf.ConvertJsonToPdf(jsonFilePath);
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult ConvertJsonToPdf(string jsonInput, string fontType, int fontSize)
+        {
+            if (string.IsNullOrEmpty(jsonInput))
+            {
+                ViewBag.ErrorMessage = "JSON input is required";
+                return View("Index");
+            }
+
+            FileContentResult pdfResult = JsonToPdf.ConvertJsonToPdf(jsonInput, fontType, fontSize);
 
             // Set to download pdf file
             Response.Headers.Add("content-disposition", $"attachment; filename={pdfResult.FileDownloadName}");
