@@ -19,7 +19,7 @@
         <div class="row">        
             <div class="col-8">
                 <!-- JSON Editor Container -->
-                <textarea name="jsonInput" rows="10" cols="65" class="form-control"></textarea><br /><br />
+                <textarea name="jsonInput" id="jsonInput" rows="10" cols="65" class="form-control"></textarea><br /><br />
             </div>
             <div class="col-4">
                 <h5>Options <sup>(Optional)</sup></h5>
@@ -27,12 +27,12 @@
 
                 <div class="form-group">
                     <label for="fontSize">Ukuran Font:</label>
-                    <input type="text" name="fontSize" value="12" class="form-control">
+                    <input type="text" name="fontSize" id="fontSize" value="12" class="form-control">
                 </div>
 
                 <div class="form-group">
                     <label for="fontType">Jenis Font:</label>
-                    <select name="fontType" class="form-control">
+                    <select name="fontType" id="fontType" class="form-control">
                         <option value="Arial">Arial</option>
                         <option value="Calibri">Calibri</option>
                         <option value="Cambria">Cambria</option>
@@ -40,9 +40,38 @@
                     </select>
                 </div>
 
-                <input type="submit" value="Convert" class="btn btn-primary mt-3" />
+                <input type="button" id="convertButton" value="Convert" class="btn btn-primary mt-3" />
             </div>
         </div>
     </form>
+
+    <div class="row">
+        <div class="col-12">
+            <iframe id="pdfPreview" width="100%" height="500"></iframe>
+        </div>
+    </div>
     
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#convertButton').click(function () {
+            // Ambil data JSON dari textarea
+            var jsonInput = $('#jsonInput').val();
+            var fontSize = $('#fontSize').val();
+            var fontType = $('#fontType').val();
+
+            // Kirim data JSON ke server
+            $.post('/Home/ConvertJsonToPdf', {
+                jsonInput: jsonInput,
+                fontSize: fontSize,
+                fontType: fontType
+            }, function (response) {
+                // Perbarui pratinjau PDF
+                $('#pdfPreview').attr('src', 'data:application/pdf;base64,' + response);
+            });
+        });
+    });
+</script>
+

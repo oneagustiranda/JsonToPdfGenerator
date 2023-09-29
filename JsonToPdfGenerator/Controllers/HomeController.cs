@@ -31,10 +31,15 @@ namespace JsonToPdfGenerator.Controllers
 
             FileContentResult pdfResult = JsonToPdf.ConvertJsonToPdf(jsonInput, fontType, fontSize);
 
-            // Set to download pdf file
-            Response.Headers.Add("content-disposition", $"attachment; filename={pdfResult.FileDownloadName}");
+            // Mengambil hasil PDF sebagai byte array
+            byte[] pdfBytes = pdfResult.FileContents;
 
-            return File(pdfResult.FileContents, pdfResult.ContentType);
+            // Mengonversi byte array menjadi string base64
+            string base64Pdf = Convert.ToBase64String(pdfBytes);
+            ViewBag.base64Pdf = base64Pdf;
+
+            // Mengembalikan string base64 sebagai respons
+            return Content(base64Pdf, "application/pdf");
         }
 
         public IActionResult Privacy()
