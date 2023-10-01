@@ -21,7 +21,8 @@ namespace JsonToPdfGenerator.Controllers
         }
 
         [HttpPost]
-        public IActionResult ConvertJsonToPdf(string jsonInput, string fontName, int fontSize, float leftMargin, float rightMargin, float topMargin, float bottomMargin, string headerText)
+        public IActionResult ConvertJsonToPdf(string jsonInput, string fontName, int fontSize, 
+            float leftMargin, float rightMargin, float topMargin, float bottomMargin, string headerText, string pdfPassword)
         {
             try
             {
@@ -31,7 +32,7 @@ namespace JsonToPdfGenerator.Controllers
                     return View("Index");
                 }
 
-                string pdfBase64 = JsonToPdf.ConvertJsonToPdf(jsonInput, fontName, fontSize, leftMargin, rightMargin, topMargin, bottomMargin, headerText);
+                string pdfBase64 = JsonToPdf.ConvertJsonToPdf(jsonInput, fontName, fontSize, leftMargin, rightMargin, topMargin, bottomMargin, headerText, pdfPassword);
 
                 if (!string.IsNullOrEmpty(pdfBase64))
                 {

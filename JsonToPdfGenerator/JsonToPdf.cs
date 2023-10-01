@@ -71,7 +71,7 @@ namespace JsonToPdfGenerator
         #region Function to convert json to pdf
         public static string ConvertJsonToPdf(
             string jsonInput, string fontName, int fontSize, float leftMargin,
-            float rightMargin, float topMargin, float bottomMargin, string headerText)
+            float rightMargin, float topMargin, float bottomMargin, string headerText, string pdfPassword)
         {
             // Read JSON
             var jsonData = JsonConvert.DeserializeObject<Dictionary<string, JToken>>(jsonInput);
@@ -80,6 +80,15 @@ namespace JsonToPdfGenerator
             Document document = new Document();
             MemoryStream memoryStream = new MemoryStream();
             PdfWriter writer = PdfWriter.GetInstance(document, memoryStream);
+
+            // Set password if have password value by user
+            if (!string.IsNullOrEmpty(pdfPassword))
+            {
+                writer.SetEncryption(
+                    Encoding.ASCII.GetBytes(pdfPassword), // Convert password to byte
+                    Encoding.ASCII.GetBytes(pdfPassword), // Confirmation password
+                    PdfWriter.ALLOW_PRINTING, PdfWriter.ENCRYPTION_AES_128);
+            }
 
             Font font = SetContentFont(fontName, fontSize);
 

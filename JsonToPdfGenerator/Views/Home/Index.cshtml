@@ -66,6 +66,12 @@
                     <input type="text" name="headerText" id="headerText" class="form-control">
                 </div>
 
+                <div class="form-group">
+                    <label for="pdfPassword">Password PDF:</label>
+                    <input type="text" name="pdfPassword" id="pdfPassword" class="form-control">
+                </div>
+
+
                 <input type="submit" id="convertButton" value="Convert" class="btn btn-primary mt-3" />
             </div>
         </div>
@@ -94,6 +100,7 @@
             var topMargin = $('#topMargin').val();
             var bottomMargin = $('#bottomMargin').val();
             var headerText = $('#headerText').val();
+            var headerText = $('#pdfPassword').val();
 
             // Send JSON data to server
             $.post('/Home/ConvertJsonToPdf', {
@@ -104,7 +111,8 @@
                 rightMargin: rightMargin,
                 topMargin: topMargin,
                 bottomMargin: bottomMargin,
-                headerText: headerText
+                headerText: headerText,
+                pdfPassword: pdfPassword
             })
             .done(function (response) {
                 if (response) {
