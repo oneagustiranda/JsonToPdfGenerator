@@ -21,26 +21,36 @@ namespace JsonToPdfGenerator.Controllers
         }
 
         [HttpPost]
-        public IActionResult ConvertJsonToPdf(string jsonInput, string fontType, int fontSize)
+        public IActionResult ConvertJsonToPdf(string jsonInput, string fontName, int fontSize, float leftMargin, float rightMargin, float topMargin, float bottomMargin, string headerText)
         {
-            if (string.IsNullOrEmpty(jsonInput))
+            try
             {
-                ViewBag.ErrorMessage = "JSON input is required";
+                if (string.IsNullOrEmpty(jsonInput))
+                {
+                    ViewBag.ErrorMessage = "JSON input is required";
+                    return View("Index");
+                }
+
+                string pdfBase64 = JsonToPdf.ConvertJsonToPdf(jsonInput, fontName, fontSize, leftMargin, rightMargin, topMargin, bottomMargin, headerText);
+
+                if (!string.IsNullOrEmpty(pdfBase64))
+                {
+                    // Send base64 string to view
+                    ViewBag.PdfBase64 = pdfBase64;
+                }
+                else
+                {
+                    ViewBag.ErrorMessage = "Failed to generate PDF. Please check your JSON input.";
+                }
+
                 return View("Index");
             }
-
-            FileContentResult pdfResult = JsonToPdf.ConvertJsonToPdf(jsonInput, fontType, fontSize);
-
-            // Mengambil hasil PDF sebagai byte array
-            byte[] pdfBytes = pdfResult.FileContents;
-
-            // Mengonversi byte array menjadi string base64
-            string base64Pdf = Convert.ToBase64String(pdfBytes);
-            ViewBag.base64Pdf = base64Pdf;
-
-            // Mengembalikan string base64 sebagai respons
-            return Content(base64Pdf, "application/pdf");
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+
 
         public IActionResult Privacy()
         {

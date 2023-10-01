@@ -15,15 +15,15 @@
         </div>
     }    
 
-    <form method="post" action="/Home/ConvertJsonToPdf" class="form-inline">
+    <form method="post" action="@Url.Action("ConvertJsonToPdf", "Home")" class="form-inline">
         <div class="row">        
             <div class="col-8">
                 <!-- JSON Editor Container -->
-                <textarea name="jsonInput" id="jsonInput" rows="10" cols="65" class="form-control"></textarea><br /><br />
+                <textarea name="jsonInput" id="jsonInput" rows="15" cols="65" class="form-control"></textarea><br /><br />
             </div>
             <div class="col-4">
                 <h5>Options <sup>(Optional)</sup></h5>
-                <!-- Tambahkan elemen-elemen konfigurasi tambahan di sini -->
+                <!-- Option element -->
 
                 <div class="form-group">
                     <label for="fontSize">Ukuran Font:</label>
@@ -31,47 +31,91 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="fontType">Jenis Font:</label>
-                    <select name="fontType" id="fontType" class="form-control">
+                    <label for="fontName">Jenis Font:</label>
+                    <select name="fontName" id="fontType" class="form-control">
                         <option value="Arial">Arial</option>
                         <option value="Calibri">Calibri</option>
-                        <option value="Cambria">Cambria</option>
-                        <!-- Tambahkan pilihan jenis font lainnya -->
+                        <option value="Times-Roman">Times New Roman</option>
                     </select>
                 </div>
+               
+                <div class="form-group">
+                    <label for="margin">Margin <sup>(cm)</sup>: </label>
+                    <div class="row">
+                        <div class="col">
+                            <label for="leftMargin"><small>Left</small></label>
+                            <input type="number" name="leftMargin" id="leftMargin" step="any" value="1" class="form-control">
+                        </div>
+                        <div class="col">
+                            <label for="rightMargin"><small>Right</small></label>
+                            <input type="number" name="rightMargin" id="rightMargin" step="any" value="1" class="form-control">
+                        </div>
+                        <div class="col">
+                            <label for="topMargin"><small>Top</small></label>
+                            <input type="number" name="topMargin" id="topMargin" step="any" value="1.5" class="form-control">
+                        </div>
+                        <div class="col">
+                            <label for="bottomMargin"><small>Bottom</small></label>
+                            <input type="number" name="bottomMargin" id="bottomMargin" step="any" value="1.5" class="form-control">
+                        </div>
+                    </div>
+                </div>
 
-                <input type="button" id="convertButton" value="Convert" class="btn btn-primary mt-3" />
+                <div class="form-group">
+                    <label for="headerText">Header Text:</label>
+                    <input type="text" name="headerText" id="headerText" class="form-control">
+                </div>
+
+                <input type="submit" id="convertButton" value="Convert" class="btn btn-primary mt-3" />
             </div>
         </div>
     </form>
 
     <div class="row">
-        <div class="col-12">
-            <iframe id="pdfPreview" width="100%" height="500"></iframe>
+        <div class="col-12">  
+            @if (!string.IsNullOrEmpty(ViewBag.PdfBase64))
+            {
+                <iframe src='data:application/pdf;base64,@ViewBag.PdfBase64' frameborder="0" width="100%" height="500"></iframe>
+            }
         </div>
     </div>
     
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
         $('#convertButton').click(function () {
-            // Ambil data JSON dari textarea
+            // Get JSON data from textarea
             var jsonInput = $('#jsonInput').val();
             var fontSize = $('#fontSize').val();
-            var fontType = $('#fontType').val();
+            var fontName = $('#fontName').val();
+            var leftMargin = $('#leftMargin').val();
+            var rightMargin = $('#rightMargin').val();
+            var topMargin = $('#topMargin').val();
+            var bottomMargin = $('#bottomMargin').val();
+            var headerText = $('#headerText').val();
 
-            // Kirim data JSON ke server
+            // Send JSON data to server
             $.post('/Home/ConvertJsonToPdf', {
                 jsonInput: jsonInput,
                 fontSize: fontSize,
-                fontType: fontType
-            }, function (response) {
-                // Perbarui pratinjau PDF
-                $('#pdfPreview').attr('src', 'data:application/pdf;base64,' + response);
+                fontName: fontName,
+                leftMargin: leftMargin,
+                rightMargin: rightMargin,
+                topMargin: topMargin,
+                bottomMargin: bottomMargin,
+                headerText: headerText
+            })
+            .done(function (response) {
+                if (response) {
+                    $('#pdfPreview').attr('src', 'data:application/pdf;base64,' + response);
+                } else {
+                     alert('Failed to convert JSON to PDF. Make sure the JSON input is valid or there are other issues.');
+                }
+            })
+            .fail(function (error) {
+                 alert('An error occurred while sending a request to the server: ' + error.statusText);
             });
         });
     });
 </script>
-

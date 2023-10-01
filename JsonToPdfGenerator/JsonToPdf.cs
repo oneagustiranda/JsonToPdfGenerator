@@ -12,20 +12,8 @@ namespace JsonToPdfGenerator
 {
     public class JsonToPdf
     {
-        #region Function to convert json to pdf
-        public static FileContentResult ConvertJsonToPdf(string jsonInput, string fontName, int fontSize)
+        public static Font SetContentFont(string fontName, int fontSize)
         {
-            // Read JSON
-            var jsonData = JsonConvert.DeserializeObject<Dictionary<string, JToken>>(jsonInput);
-
-            // Create PDF document
-            Document document = new Document();
-            MemoryStream memoryStream = new MemoryStream();
-            PdfWriter writer = PdfWriter.GetInstance(document, memoryStream);
-
-            // Open document for writing
-            document.Open();
-
             // Set font and font size
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
@@ -45,6 +33,65 @@ namespace JsonToPdfGenerator
             }
 
             Font font = new Font(bf, fontSize);
+            return font;
+        }
+
+        public int ConvertCmToPoint(float cmValue)
+        {
+            float pointValue = cmValue * 28.3464567f;
+            return (int)pointValue;
+        }
+        
+        public static void SetMinimumMarginPdf(Document document, float leftMargin, float rightMargin, float topMargin, float bottomMargin)
+        {
+            JsonToPdf jsonToPdf = new JsonToPdf();
+
+            // Minimum value for margin (size in point)
+            int minLeftMargin = 20;
+            int minRightMargin = 20;
+            int minTopMargin = 30;
+            int minBottomMargin = 50;
+
+            // Margin value from user is cm
+            int userLeftMargin = jsonToPdf.ConvertCmToPoint(leftMargin);
+            int userRightMargin = jsonToPdf.ConvertCmToPoint(rightMargin);
+            int userTopMargin = jsonToPdf.ConvertCmToPoint(topMargin);
+            int userBottomMargin = jsonToPdf.ConvertCmToPoint(bottomMargin);
+
+            // Margin value not less than minimum value
+            int adjustedLeftMargin = Math.Max(userLeftMargin, minLeftMargin);
+            int adjustedRightMargin = Math.Max(userRightMargin, minRightMargin);
+            int adjustedTopMargin = Math.Max(userTopMargin, minTopMargin);
+            int adjustedBottomMargin = Math.Max(userBottomMargin, minBottomMargin);
+
+            // Set Margin to document
+            document.SetMargins(adjustedLeftMargin, adjustedRightMargin, adjustedTopMargin, adjustedBottomMargin);
+        }
+
+        #region Function to convert json to pdf
+        public static string ConvertJsonToPdf(
+            string jsonInput, string fontName, int fontSize, float leftMargin,
+            float rightMargin, float topMargin, float bottomMargin, string headerText)
+        {
+            // Read JSON
+            var jsonData = JsonConvert.DeserializeObject<Dictionary<string, JToken>>(jsonInput);
+
+            // Create PDF document
+            Document document = new Document();
+            MemoryStream memoryStream = new MemoryStream();
+            PdfWriter writer = PdfWriter.GetInstance(document, memoryStream);
+
+            Font font = SetContentFont(fontName, fontSize);
+
+            // Add header and footer
+            PdfHeaderFooter eventHelper = new PdfHeaderFooter(font, headerText);
+            writer.PageEvent = eventHelper;
+
+            SetMinimumMarginPdf(document, leftMargin, rightMargin, topMargin, bottomMargin);
+
+            // Open document for writing
+            document.Open();
+            document.Add(new Paragraph(" "));
 
             // Create a Unicode encoding for text conversion
             Encoding unicodeEncoding = Encoding.Unicode;
@@ -52,7 +99,7 @@ namespace JsonToPdfGenerator
             foreach (var category in jsonData)
             {
                 PdfPTable pdfTable = new PdfPTable(2);
-                pdfTable.WidthPercentage = 80;                
+                pdfTable.WidthPercentage = 100;                
 
                 // Object data type
                 if (category.Value is JObject categoryData)
@@ -81,7 +128,7 @@ namespace JsonToPdfGenerator
                             {
                                 // Create new table every time it encounters the first object in the array
                                 arrayTable = new PdfPTable(numColumns);
-                                arrayTable.WidthPercentage = 80;
+                                arrayTable.WidthPercentage = 100;
 
                                 // Add table name in first column                                
                                 arrayTable.AddCell(new Phrase(unicodeEncoding.GetString(unicodeEncoding.GetBytes(category.Key)), font));
@@ -121,10 +168,9 @@ namespace JsonToPdfGenerator
 
             // Prepare PDF result as respons
             byte[] pdfBytes = memoryStream.ToArray();
-            return new FileContentResult(pdfBytes, "application/pdf")
-            {
-                FileDownloadName = "Data-output-json-to.pdf"
-            };
+            string pdfBase64 = Convert.ToBase64String(pdfBytes);
+
+            return pdfBase64;
         }
         #endregion
     }
