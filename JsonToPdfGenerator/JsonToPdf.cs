@@ -12,7 +12,7 @@ namespace JsonToPdfGenerator
 {
     public class JsonToPdf
     {
-        public static Font SetContentFont(string fontName, int fontSize)
+        private static Font SetContentFont(string fontName, int fontSize)
         {
             // Set font and font size
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -36,13 +36,13 @@ namespace JsonToPdfGenerator
             return font;
         }
 
-        public int ConvertCmToPoint(float cmValue)
+        private int ConvertCmToPoint(float cmValue)
         {
             float pointValue = cmValue * 28.3464567f;
             return (int)pointValue;
         }
         
-        public static void SetMinimumMarginPdf(Document document, float leftMargin, float rightMargin, float topMargin, float bottomMargin)
+        private static void SetMinimumMarginPdf(Document document, float leftMargin, float rightMargin, float topMargin, float bottomMargin)
         {
             JsonToPdf jsonToPdf = new JsonToPdf();
 
@@ -68,47 +68,15 @@ namespace JsonToPdfGenerator
             document.SetMargins(adjustedLeftMargin, adjustedRightMargin, adjustedTopMargin, adjustedBottomMargin);
         }
 
-        #region Function to convert json to pdf
-        public static string ConvertJsonToPdf(
-            string jsonInput, string fontName, int fontSize, float leftMargin,
-            float rightMargin, float topMargin, float bottomMargin, string headerText, string pdfPassword)
+        private static void ProcessDataToTable(JObject jsonObject, Document document, Font font)
         {
-            // Read JSON
-            var jsonData = JsonConvert.DeserializeObject<Dictionary<string, JToken>>(jsonInput);
-
-            // Create PDF document
-            Document document = new Document();
-            MemoryStream memoryStream = new MemoryStream();
-            PdfWriter writer = PdfWriter.GetInstance(document, memoryStream);
-
-            // Set password if have password value by user
-            if (!string.IsNullOrEmpty(pdfPassword))
-            {
-                writer.SetEncryption(
-                    Encoding.ASCII.GetBytes(pdfPassword), // Convert password to byte
-                    Encoding.ASCII.GetBytes(pdfPassword), // Confirmation password
-                    PdfWriter.ALLOW_PRINTING, PdfWriter.ENCRYPTION_AES_128);
-            }
-
-            Font font = SetContentFont(fontName, fontSize);
-
-            // Add header and footer
-            PdfHeaderFooter eventHelper = new PdfHeaderFooter(font, headerText);
-            writer.PageEvent = eventHelper;
-
-            SetMinimumMarginPdf(document, leftMargin, rightMargin, topMargin, bottomMargin);
-
-            // Open document for writing
-            document.Open();
-            document.Add(new Paragraph(" "));
-
             // Create a Unicode encoding for text conversion
             Encoding unicodeEncoding = Encoding.Unicode;
 
-            foreach (var category in jsonData)
+            foreach (var category in jsonObject)
             {
                 PdfPTable pdfTable = new PdfPTable(2);
-                pdfTable.WidthPercentage = 100;                
+                pdfTable.WidthPercentage = 100;
 
                 // Object data type
                 if (category.Value is JObject categoryData)
@@ -117,7 +85,7 @@ namespace JsonToPdfGenerator
                     pdfTable.AddCell(""); // Empty cell
 
                     foreach (var item in categoryData)
-                    {                        
+                    {
                         pdfTable.AddCell(new Phrase(unicodeEncoding.GetString(unicodeEncoding.GetBytes(item.Key)), font));
                         pdfTable.AddCell(new Phrase(unicodeEncoding.GetString(unicodeEncoding.GetBytes(item.Value.ToString())), font));
                     }
@@ -146,9 +114,9 @@ namespace JsonToPdfGenerator
                                 foreach (var arrayItemProperty in arrayItemObject.Properties())
                                 {
                                     if (arrayItemObject.Properties().First() != arrayItemProperty)
-                                    {                                        
+                                    {
                                         arrayTable.AddCell(new Phrase(unicodeEncoding.GetString(unicodeEncoding.GetBytes(arrayItemProperty.Name)), font));
-                                    }                                    
+                                    }
                                 }
                             }
 
@@ -170,6 +138,56 @@ namespace JsonToPdfGenerator
 
                 // Add space area between table
                 document.Add(new Paragraph(" "));
+            }
+        }
+
+        #region Function to convert json to pdf
+        public static string ConvertJsonToPdf(
+            string jsonInput, string fontName, int fontSize, float leftMargin,
+            float rightMargin, float topMargin, float bottomMargin, string headerText, string pdfPassword)
+        {
+            // Parse JSON
+            var jsonData = JToken.Parse(jsonInput);
+
+            // Create PDF document
+            Document document = new Document();
+            MemoryStream memoryStream = new MemoryStream();
+            PdfWriter writer = PdfWriter.GetInstance(document, memoryStream);
+
+            // Set password if have password value by user
+            if (!string.IsNullOrEmpty(pdfPassword))
+            {
+                writer.SetEncryption(
+                    Encoding.ASCII.GetBytes(pdfPassword), // Convert password to byte
+                    Encoding.ASCII.GetBytes(pdfPassword), // Confirmation password
+                    PdfWriter.ALLOW_PRINTING, PdfWriter.ENCRYPTION_AES_128);
+            }
+
+            Font font = SetContentFont(fontName, fontSize);
+
+            // Add header and footer
+            PdfHeaderFooter eventHelper = new PdfHeaderFooter(font, headerText);
+            writer.PageEvent = eventHelper;
+
+            SetMinimumMarginPdf(document, leftMargin, rightMargin, topMargin, bottomMargin);
+
+            // Open document for writing
+            document.Open();
+            document.Add(new Paragraph(" "));            
+
+            if (jsonData is JObject jsonObject)
+            {
+                ProcessDataToTable(jsonObject, document, font);
+            }
+            else if (jsonData is JArray jsonArray)
+            {
+                foreach (var arrayItem in jsonArray)
+                {
+                    if (arrayItem is JObject arrayItemObject)
+                    {
+                        ProcessDataToTable(arrayItemObject, document, font);
+                    }
+                }
             }
 
             // Close document
