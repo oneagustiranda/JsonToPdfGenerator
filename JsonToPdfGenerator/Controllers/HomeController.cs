@@ -1,8 +1,12 @@
-﻿using JsonToPdfGenerator.Models;
+﻿using System.Web;
+using JsonToPdfGenerator.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 using System.Text.Json;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace JsonToPdfGenerator.Controllers
 {
@@ -21,18 +25,13 @@ namespace JsonToPdfGenerator.Controllers
         }
 
         [HttpPost]
-        public IActionResult ConvertJsonToPdf(string jsonInput, string fontName, int fontSize, 
+        public IActionResult ConvertJsonToPdf(string jsonInput, IFormFile logoImage, string fontName, int fontSize, 
             float leftMargin, float rightMargin, float topMargin, float bottomMargin, string headerText, string pdfPassword)
         {
             try
             {
-                if (string.IsNullOrEmpty(jsonInput))
-                {
-                    ViewBag.ErrorMessage = "JSON input is required";
-                    return View("Index");
-                }
-
-                string pdfBase64 = JsonToPdf.ConvertJsonToPdf(jsonInput, fontName, fontSize, leftMargin, rightMargin, topMargin, bottomMargin, headerText, pdfPassword);
+                string pdfBase64 = JsonToPdf.ConvertJsonToPdf(jsonInput, logoImage, fontName, fontSize, 
+                    leftMargin, rightMargin, topMargin, bottomMargin, headerText, pdfPassword);
 
                 if (!string.IsNullOrEmpty(pdfBase64))
                 {

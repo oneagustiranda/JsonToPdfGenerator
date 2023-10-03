@@ -15,7 +15,7 @@
         </div>
     }    
 
-    <form method="post" action="@Url.Action("ConvertJsonToPdf", "Home")" class="form-inline">
+    <form method="post" action="@Url.Action("ConvertJsonToPdf", "Home")" class="form-inline" enctype="multipart/form-data">
         <div class="row">        
             <div class="col-8">
                 <!-- JSON Editor Container -->
@@ -52,7 +52,7 @@
                         </div>
                         <div class="col">
                             <label for="topMargin"><small>Top</small></label>
-                            <input type="number" name="topMargin" id="topMargin" step="any" value="1.5" class="form-control">
+                            <input type="number" name="topMargin" id="topMargin" step="any" value="2" class="form-control">
                         </div>
                         <div class="col">
                             <label for="bottomMargin"><small>Bottom</small></label>
@@ -71,6 +71,10 @@
                     <input type="text" name="pdfPassword" id="pdfPassword" class="form-control">
                 </div>
 
+                <div class="form-group">
+                    <label for="logoImage">Upload Logo:</label>
+                    <input type="file" name="logoImage" id="logoImage" class="form-control">
+                </div>
 
                 <input type="submit" id="convertButton" value="Convert" class="btn btn-primary mt-3" />
             </div>

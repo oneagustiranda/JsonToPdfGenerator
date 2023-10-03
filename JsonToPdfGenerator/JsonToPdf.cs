@@ -143,7 +143,7 @@ namespace JsonToPdfGenerator
 
         #region Function to convert json to pdf
         public static string ConvertJsonToPdf(
-            string jsonInput, string fontName, int fontSize, float leftMargin,
+            string jsonInput, IFormFile logoImage, string fontName, int fontSize, float leftMargin,
             float rightMargin, float topMargin, float bottomMargin, string headerText, string pdfPassword)
         {
             // Parse JSON
@@ -163,17 +163,29 @@ namespace JsonToPdfGenerator
                     PdfWriter.ALLOW_PRINTING, PdfWriter.ENCRYPTION_AES_128);
             }
 
+            // Check if a logo image was provided
+            string logoPath = null;
+            if (logoImage != null && logoImage.Length > 0)
+            {
+                // Save the logo image to a temporary location (adjust the path as needed)
+                logoPath = Path.Combine(Path.GetTempPath(), logoImage.FileName);
+                using (var stream = new FileStream(logoPath, FileMode.Create))
+                {
+                    logoImage.CopyTo(stream);
+                }
+            }
+
             Font font = SetContentFont(fontName, fontSize);
 
             // Add header and footer
-            PdfHeaderFooter eventHelper = new PdfHeaderFooter(font, headerText);
+            PdfHeaderFooter eventHelper = new PdfHeaderFooter(font, headerText, logoPath);
             writer.PageEvent = eventHelper;
 
             SetMinimumMarginPdf(document, leftMargin, rightMargin, topMargin, bottomMargin);
 
             // Open document for writing
             document.Open();
-            document.Add(new Paragraph(" "));            
+            document.Add(new Paragraph(" "));
 
             if (jsonData is JObject jsonObject)
             {
@@ -196,6 +208,12 @@ namespace JsonToPdfGenerator
             // Prepare PDF result as respons
             byte[] pdfBytes = memoryStream.ToArray();
             string pdfBase64 = Convert.ToBase64String(pdfBytes);
+
+            // Remove logo image in temp folder
+            if (!string.IsNullOrEmpty(logoPath) && System.IO.File.Exists(logoPath))
+            {
+                System.IO.File.Delete(logoPath);
+            }
 
             return pdfBase64;
         }
