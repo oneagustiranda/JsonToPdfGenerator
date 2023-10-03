@@ -42,6 +42,31 @@ namespace JsonToPdfGenerator
             return (int)pointValue;
         }
         
+        private static void SetPageSizeAndOrientation(Document document, string pageSize, string pageOrientation)
+        {
+            // Set page size based on user input
+            Rectangle pageSizeObject = null;
+            switch (pageSize)
+            {
+                case "A4":
+                    pageSizeObject = PageSize.A4;
+                    break;
+                case "Letter":
+                    pageSizeObject = PageSize.LETTER;
+                    break;
+            }
+
+            if (pageSizeObject != null)
+            {
+                document.SetPageSize(pageSizeObject);
+            }
+
+            // Set page orientation based on user input
+            if (pageOrientation == "Landscape")
+            {
+                document.SetPageSize(pageSizeObject.Rotate());
+            }
+        }
         private static void SetMinimumMarginPdf(Document document, float leftMargin, float rightMargin, float topMargin, float bottomMargin)
         {
             JsonToPdf jsonToPdf = new JsonToPdf();
@@ -143,16 +168,19 @@ namespace JsonToPdfGenerator
 
         #region Function to convert json to pdf
         public static string ConvertJsonToPdf(
-            string jsonInput, IFormFile logoImage, string fontName, int fontSize, float leftMargin,
+            string jsonInput, IFormFile logoImage, string fontName, int fontSize, string pageSize, string pageOrientation, float leftMargin,
             float rightMargin, float topMargin, float bottomMargin, string headerText, string pdfPassword)
         {
             // Parse JSON
             var jsonData = JToken.Parse(jsonInput);
 
+
             // Create PDF document
             Document document = new Document();
             MemoryStream memoryStream = new MemoryStream();
             PdfWriter writer = PdfWriter.GetInstance(document, memoryStream);
+
+            SetPageSizeAndOrientation(document, pageSize, pageOrientation);
 
             // Set password if have password value by user
             if (!string.IsNullOrEmpty(pdfPassword))
@@ -167,7 +195,7 @@ namespace JsonToPdfGenerator
             string logoPath = null;
             if (logoImage != null && logoImage.Length > 0)
             {
-                // Save the logo image to a temporary location (adjust the path as needed)
+                // Save the logo image to a temporary location
                 logoPath = Path.Combine(Path.GetTempPath(), logoImage.FileName);
                 using (var stream = new FileStream(logoPath, FileMode.Create))
                 {

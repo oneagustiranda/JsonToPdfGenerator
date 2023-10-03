@@ -18,29 +18,52 @@
     <form method="post" action="@Url.Action("ConvertJsonToPdf", "Home")" class="form-inline" enctype="multipart/form-data">
         <div class="row">        
             <div class="col-8">
-                <!-- JSON Editor Container -->
-                <textarea name="jsonInput" id="jsonInput" rows="15" cols="65" class="form-control"></textarea><br /><br />
+                <div class="json-container">
+                    <div id="lineNumbers"></div>
+                    <textarea name="jsonInput" id="jsonInput" rows="20" class="form-control" aria-label="jsonInput"></textarea>
+                </div>
             </div>
             <div class="col-4">
-                <h5>Options <sup>(Optional)</sup></h5>
+                <h5>Options <sup class="text-muted">(Optional)</sup></h5>
                 <!-- Option element -->
 
-                <div class="form-group">
-                    <label for="fontSize">Ukuran Font:</label>
-                    <input type="text" name="fontSize" id="fontSize" value="12" class="form-control">
+                <div class="form-group mb-2">
+                    <label for="margin">Font</label>
+                    <div class="row">
+                        <div class="col-8">
+                            <label for="fontName"><small>Name</small></label>
+                            <select name="fontName" id="fontName" class="form-control">
+                                <option value="Arial">Arial</option>
+                                <option value="Calibri">Calibri</option>
+                                <option value="Times-Roman">Times New Roman</option>
+                            </select>
+                        </div>
+                        <div class="col-4">
+                            <label for="fontSize"><small>Size</small></label>
+                            <input type="text" name="fontSize" id="fontSize" value="12" class="form-control">
+                        </div>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="fontName">Jenis Font:</label>
-                    <select name="fontName" id="fontType" class="form-control">
-                        <option value="Arial">Arial</option>
-                        <option value="Calibri">Calibri</option>
-                        <option value="Times-Roman">Times New Roman</option>
-                    </select>
+                <div class="form-group mb-2">
+                    <div class="row">
+                        <div class="col-3">
+                            <label for="pageSize">Page Size</label>
+                            <select name="pageSize" id="pageSize" class="form-control">
+                                <option value="A4">A4</option>
+                                <option value="Letter">Letter</option>
+                            </select>
+                        </div>
+                        <div class="col-9">
+                            <label>Page Orientation</label><br />
+                            <input type="radio" name="pageOrientation" value="Portrait" checked> Portrait 
+                            <input type="radio" name="pageOrientation" value="Landscape"> Landscape
+                        </div>
+                    </div>                    
                 </div>
                
-                <div class="form-group">
-                    <label for="margin">Margin <sup>(cm)</sup>: </label>
+                <div class="form-group mb-2">
+                    <label for="margin">Margin <sup>(cm)</sup></label>
                     <div class="row">
                         <div class="col">
                             <label for="leftMargin"><small>Left</small></label>
@@ -61,22 +84,22 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="headerText">Header Text:</label>
+                <div class="form-group mb-2">
+                    <label for="headerText">Header Text</label>
                     <input type="text" name="headerText" id="headerText" class="form-control">
                 </div>
 
-                <div class="form-group">
-                    <label for="pdfPassword">Password PDF:</label>
+                <div class="form-group mb-2">
+                    <label for="pdfPassword">Password PDF</label>
                     <input type="text" name="pdfPassword" id="pdfPassword" class="form-control">
                 </div>
 
-                <div class="form-group">
-                    <label for="logoImage">Upload Logo:</label>
+                <div class="form-group mb-2">
+                    <label for="logoImage">Upload Logo</label>
                     <input type="file" name="logoImage" id="logoImage" class="form-control">
                 </div>
 
-                <input type="submit" id="convertButton" value="Convert" class="btn btn-primary mt-3" />
+                <input type="submit" id="convertButton" value="Convert" class="btn btn-primary mt-2" />
             </div>
         </div>
     </form>
@@ -91,43 +114,3 @@
     </div>
     
 </div>
-
-<script>
-    $(document).ready(function () {
-        $('#convertButton').click(function () {
-            // Get JSON data from textarea
-            var jsonInput = $('#jsonInput').val();
-            var fontSize = $('#fontSize').val();
-            var fontName = $('#fontName').val();
-            var leftMargin = $('#leftMargin').val();
-            var rightMargin = $('#rightMargin').val();
-            var topMargin = $('#topMargin').val();
-            var bottomMargin = $('#bottomMargin').val();
-            var headerText = $('#headerText').val();
-            var headerText = $('#pdfPassword').val();
-
-            // Send JSON data to server
-            $.post('/Home/ConvertJsonToPdf', {
-                jsonInput: jsonInput,
-                fontSize: fontSize,
-                fontName: fontName,
-                leftMargin: leftMargin,
-                rightMargin: rightMargin,
-                topMargin: topMargin,
-                bottomMargin: bottomMargin,
-                headerText: headerText,
-                pdfPassword: pdfPassword
-            })
-            .done(function (response) {
-                if (response) {
-                    $('#pdfPreview').attr('src', 'data:application/pdf;base64,' + response);
-                } else {
-                     alert('Failed to convert JSON to PDF. Make sure the JSON input is valid or there are other issues.');
-                }
-            })
-            .fail(function (error) {
-                 alert('An error occurred while sending a request to the server: ' + error.statusText);
-            });
-        });
-    });
-</script>
