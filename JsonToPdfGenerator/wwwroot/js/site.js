@@ -39,7 +39,8 @@ document.getElementById("jsonInput").addEventListener("input", addLineNumber);
 
 // Send value from view to controller
 $(document).ready(function () {
-    $('#convertButton').click(function () {
+    $('#generateButton').click(function () {
+        $('#jsonForm').submit();
         // Get JSON data from textarea
         var jsonInput = $('#jsonInput').val();
         var fontSize = $('#fontSize').val();
@@ -80,3 +81,20 @@ $(document).ready(function () {
     });
 });
 // End - Send value from view to controller
+
+// Get pdf from pdf preview to download
+document.getElementById("downloadButton").addEventListener("click", function () {
+    var iframe = document.querySelector("iframe");
+    var iframeSrc = iframe.src;
+
+    var userFilename = prompt("Enter the filename (include file extension):", "json-to-pdf-report-generator.pdf");
+
+    if (userFilename) {
+        var downloadLink = document.createElement('a');
+        downloadLink.href = iframeSrc;
+        downloadLink.target = "_blank";
+        downloadLink.download = userFilename;
+        downloadLink.click();
+    }
+});
+//End - Get pdf from pdf preview to download

@@ -20,12 +20,13 @@ body {
 
 /* css for json input text area*/
 .json-container {
-    display: flex;
+    display: flex;    
 }
 
 #lineNumbers {
+    color: #aeb6c3;
     padding: 4px 8px;
-    background-color: #f0f0f0;
+    background-color: #fcfcfd;
     border-right: 1px solid #ccc;
     overflow-y: hidden;
 }

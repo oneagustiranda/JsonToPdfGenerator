@@ -2,31 +2,17 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="container">
-    <div class="text-center">
-        <h1 class="display-4">JSON Editor</h1>
-        <p>Convert your JSON to PDF</p>
-    </div>
-
     @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
     {
         <div class="alert alert-warning">
             <strong>Warning!</strong> @ViewBag.ErrorMessage
         </div>
-    }    
+    }        
 
-    <form method="post" action="@Url.Action("ConvertJsonToPdf", "Home")" class="form-inline" enctype="multipart/form-data">
-        <div class="row">        
-            <div class="col-8">
-                <div class="json-container">
-                    <div id="lineNumbers"></div>
-                    <textarea name="jsonInput" id="jsonInput" rows="20" class="form-control" aria-label="jsonInput"></textarea>
-                </div>
-            </div>
-            <div class="col-4">
-                <h5>Options <sup class="text-muted">(Optional)</sup></h5>
-                <!-- Option element -->
-
+    <form id="jsonForm" method="post" action="@Url.Action("ConvertJsonToPdf", "Home")" class="form-inline" enctype="multipart/form-data">
+        <!-- settings convert json to pdf-->
+        <div class="collapse mb-3" id="collapseSettings">
+            <div class="card card-body">
                 <div class="form-group mb-2">
                     <label for="margin">Font</label>
                     <div class="row">
@@ -56,12 +42,12 @@
                         </div>
                         <div class="col-9">
                             <label>Page Orientation</label><br />
-                            <input type="radio" name="pageOrientation" value="Portrait" checked> Portrait 
+                            <input type="radio" name="pageOrientation" value="Portrait" checked> Portrait
                             <input type="radio" name="pageOrientation" value="Landscape"> Landscape
                         </div>
-                    </div>                    
+                    </div>
                 </div>
-               
+
                 <div class="form-group mb-2">
                     <label for="margin">Margin <sup>(cm)</sup></label>
                     <div class="row">
@@ -98,19 +84,31 @@
                     <label for="logoImage">Upload Logo</label>
                     <input type="file" name="logoImage" id="logoImage" class="form-control">
                 </div>
-
-                <input type="submit" id="convertButton" value="Convert" class="btn btn-primary mt-2" />
             </div>
+        </div>
+        <!-- end settings section-->
+
+        <div class="row">        
+            <div class="col-6 mr-1">
+                <div class="card">
+                    <div class="json-container">
+                        <div id="lineNumbers"></div>
+                        <textarea name="jsonInput" id="jsonInput" rows="20" class="form-control" aria-label="jsonInput"></textarea>
+                    </div>
+                </div>            
+            </div>
+            <div class="col-6 ml-1">
+                <div class="card">
+                    @if (!string.IsNullOrEmpty(ViewBag.PdfBase64))
+                    {
+                        <iframe id="pdfPreview" src='data:application/pdf;base64,@ViewBag.PdfBase64' frameborder="0" width="100%" height="500"></iframe>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No preview available</p>
+                    }
+                </div>                
+             </div>
         </div>
     </form>
 
-    <div class="row">
-        <div class="col-12">  
-            @if (!string.IsNullOrEmpty(ViewBag.PdfBase64))
-            {
-                <iframe src='data:application/pdf;base64,@ViewBag.PdfBase64' frameborder="0" width="100%" height="500"></iframe>
-            }
-        </div>
-    </div>
-    
-</div>
